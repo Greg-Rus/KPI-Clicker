@@ -31,10 +31,10 @@ public class Chart : MonoBehaviour {
 
         testPoints = new Vector3[5];
         testPoints[0] = new Vector3(0f, 0f, 0f);
-        testPoints[1] = new Vector3(2f, 1f, 0f);
-        testPoints[2] = new Vector3(3f, 0f, 0f);
-        testPoints[3] = new Vector3(4f, 2f, 0f);
-        testPoints[4] = new Vector3(6f, 3f, 0f);
+        testPoints[1] = new Vector3(1f, 1f, 0f);
+        testPoints[2] = new Vector3(2f, 0f, 0f);
+        testPoints[3] = new Vector3(3f, 2f, 0f);
+        testPoints[4] = new Vector3(4f, 0f, 0f);
         chartMesh = new Mesh();
         MakeMesh();
 
@@ -72,13 +72,21 @@ public class Chart : MonoBehaviour {
             
             Vector3 start = testPoints[i];
             Vector3 end = testPoints[i + 1];
-            Debug.Log(start +" " + end);
             Vector3 side = Vector3.Cross(Vector3.back, end - start);
             side.Normalize();
-            vertices.Add(start + side * (lineWidth / 2));
-            vertices.Add(start + side * (lineWidth / -2));
-            vertices.Add(end + side * (lineWidth / 2));
-            vertices.Add(end + side * (lineWidth / -2));
+            Vector3 a = start + side * (lineWidth / 2);
+            Vector3 b = start + side * (lineWidth / -2);
+            Vector3 c = end + side * (lineWidth / 2);
+            Vector3 d = end + side * (lineWidth / -2);
+            a = AlignEdgeVertex(side * (lineWidth / 2), start);
+            b = AlignEdgeVertex(side * (lineWidth / -2), start);
+            c = AlignEdgeVertex(side * (lineWidth / 2), end);
+            d = AlignEdgeVertex(side * (lineWidth / -2), end);
+
+            vertices.Add(a);
+            vertices.Add(b);
+            vertices.Add(c);
+            vertices.Add(d);
 
             UVs.Add(new Vector2(0f, 0f));
             UVs.Add(new Vector2(1f, 0f));
@@ -94,38 +102,38 @@ public class Chart : MonoBehaviour {
 
             ++vertexCount;
         }
-        for (int i = 1; i < testPoints.Length - 1; ++i)
-        {
-            Vector3 point = testPoints[i];
-            Vector3 back = testPoints[i-1];
-            Vector3 front = testPoints[i + 1];
-            Vector3 side = Vector3.Cross(Vector3.back, back - point);
-            side.Normalize();
-            vertices.Add(point + side * (lineWidth / 2));
-            vertices.Add(point + side * (lineWidth / -2));
-            Debug.DrawLine(point + side * (lineWidth / 2), point + side * (lineWidth / -2), Color.red, 100f);
+        //for (int i = 1; i < testPoints.Length - 1; ++i)
+        //{
+        //    Vector3 point = testPoints[i];
+        //    Vector3 back = testPoints[i-1];
+        //    Vector3 front = testPoints[i + 1];
+        //    Vector3 side = Vector3.Cross(Vector3.back, back - point);
+        //    side.Normalize();
+        //    vertices.Add(point + side * (lineWidth / 2));
+        //    vertices.Add(point + side * (lineWidth / -2));
+        //    Debug.DrawLine(point + side * (lineWidth / 2), point + side * (lineWidth / -2), Color.red, 100f);
 
-            side = Vector3.Cross(Vector3.back, front - point);
-            side.Normalize();
-            vertices.Add(point + side * (lineWidth / 2));
-            vertices.Add(point + side * (lineWidth / -2));
+        //    side = Vector3.Cross(Vector3.back, front - point);
+        //    side.Normalize();
+        //    vertices.Add(point + side * (lineWidth / 2));
+        //    vertices.Add(point + side * (lineWidth / -2));
 
             
-            Debug.DrawLine(point + side * (lineWidth / 2), point + side * (lineWidth / -2), Color.red, 100f);
+        //    Debug.DrawLine(point + side * (lineWidth / 2), point + side * (lineWidth / -2), Color.red, 100f);
 
-            UVs.Add(new Vector2(0f, 0f));
-            UVs.Add(new Vector2(1f, 0f));
-            UVs.Add(new Vector2(1f, 1f));
-            UVs.Add(new Vector2(0f, 1f));
+        //    UVs.Add(new Vector2(0f, 0f));
+        //    UVs.Add(new Vector2(1f, 0f));
+        //    UVs.Add(new Vector2(1f, 1f));
+        //    UVs.Add(new Vector2(0f, 1f));
 
-            triangles.Add(vertexCount * 4 + 0);
-            triangles.Add(vertexCount * 4 + 1);
-            triangles.Add(vertexCount * 4 + 2);
-            triangles.Add(vertexCount * 4 + 0);
-            triangles.Add(vertexCount * 4 + 3);
-            triangles.Add(vertexCount * 4 + 1);
-            ++vertexCount;
-        }
+        //    triangles.Add(vertexCount * 4 + 0);
+        //    triangles.Add(vertexCount * 4 + 1);
+        //    triangles.Add(vertexCount * 4 + 2);
+        //    triangles.Add(vertexCount * 4 + 0);
+        //    triangles.Add(vertexCount * 4 + 3);
+        //    triangles.Add(vertexCount * 4 + 1);
+        //    ++vertexCount;
+        //}
         chartMesh.SetVertices(vertices);
         chartMesh.uv = UVs.ToArray();
         chartMesh.triangles = triangles.ToArray();
@@ -150,6 +158,23 @@ public class Chart : MonoBehaviour {
     //    triangles.Add(3);
     //    chartMesh.triangles = triangles.ToArray();
     //}
+    private Vector3 AlignEdgeVertex(Vector3 vertex, Vector3 point)
+    {
+        Vector3 hypotenouse;
+        if (vertex.y > 0)
+        {
+            hypotenouse = Vector3.up;
+        }
+        else
+        {
+            hypotenouse = Vector3.down;
+        }
+        float angle = Vector3.Angle(vertex, hypotenouse);
+        float hLength = vertex.magnitude / Mathf.Cos(angle);
+        Debug.Log(angle);
+        hypotenouse = hypotenouse * hLength;
+        return point + hypotenouse;
+    }
 
     private void DrawChart()
     {
