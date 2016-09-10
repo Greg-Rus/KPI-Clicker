@@ -2,17 +2,15 @@
 using System.Collections;
 using System.Collections.Generic;
 
-[RequireComponent(typeof(LineRenderer))]
+[RequireComponent(typeof(SegmentLineRenderer))]
 public class Chart : MonoBehaviour {
-    public Material chartMaterial;
+    
     private Queue<double> lastMinuteKPI;
-
+    private SegmentLineRenderer lineRenderer;
     private float xOffset = -5f;
     private float yOffset = -3f;
-    private LineRenderer lineRenderer;
-    private Mesh chartMesh;
-    public MeshFilter meshFilter;
-    public MeshRenderer meshRenderer;
+    public Vector3 origin;
+    
     public float lineWidth = 0.2f;
 
     private Vector3[] testPoints;
@@ -20,24 +18,22 @@ public class Chart : MonoBehaviour {
 	// Use this for initialization
 	void Start ()
     {
-        meshFilter = GetComponent<MeshFilter>();
-        meshRenderer = GetComponent<MeshRenderer>();
-        lineRenderer = GetComponent<LineRenderer>();
+        lineRenderer = GetComponent<SegmentLineRenderer>();
         lastMinuteKPI = new Queue<double>(60);
         for (int i = 0; i < 60; ++i)
         {
             lastMinuteKPI.Enqueue(0);
         }
 
-        testPoints = new Vector3[5];
-        testPoints[0] = new Vector3(0f, 0f, 0f);
-        testPoints[1] = new Vector3(1f, 1f, 0f);
-        testPoints[2] = new Vector3(2f, 0f, 0f);
-        testPoints[3] = new Vector3(3f, 2f, 0f);
-        testPoints[4] = new Vector3(4f, 0f, 0f);
-        chartMesh = new Mesh();
-        MakeMesh();
-
+        //testPoints = new Vector3[7];
+        //testPoints[0] = new Vector3(0f, 0f, 0f);
+        //testPoints[1] = new Vector3(1f, 2f, 0f);
+        //testPoints[2] = new Vector3(2f, 0f, 0f);
+        //testPoints[3] = new Vector3(4f, 3f, 0f);
+        //testPoints[4] = new Vector3(5f, 1f, 0f);
+        //testPoints[5] = new Vector3(5.5f, 3f, 0f);
+        //testPoints[6] = new Vector3(6f, 0f, 0f);
+        //lineRenderer.UpdateMesh(testPoints);
     }
 	
 	// Update is called once per frame
@@ -49,142 +45,39 @@ public class Chart : MonoBehaviour {
     {
         lastMinuteKPI.Dequeue();
         lastMinuteKPI.Enqueue(lastSecondKPI);
-        //DrawChart();
+        DisplayChart();
     }
 
-    private void MakeMesh()
+    public void DisplayChart()
     {
-        AddVertices();
-        //AddUVs();
-        //AddTriangles();
-        meshFilter.mesh = chartMesh;
-        meshRenderer.material = chartMaterial;
-    }
-
-    private void AddVertices()
-    {
-        List<Vector3> vertices = new List<Vector3>();
-        List<Vector2> UVs = new List<Vector2>();
-        List<int> triangles = new List<int>();
-        int vertexCount = 0;
-        for (int i = 0; i < testPoints.Length - 1; ++i)
-        {
-            
-            Vector3 start = testPoints[i];
-            Vector3 end = testPoints[i + 1];
-            Vector3 side = Vector3.Cross(Vector3.back, end - start);
-            side.Normalize();
-            Vector3 a = start + side * (lineWidth / 2);
-            Vector3 b = start + side * (lineWidth / -2);
-            Vector3 c = end + side * (lineWidth / 2);
-            Vector3 d = end + side * (lineWidth / -2);
-            a = AlignEdgeVertex(side * (lineWidth / 2), start);
-            b = AlignEdgeVertex(side * (lineWidth / -2), start);
-            c = AlignEdgeVertex(side * (lineWidth / 2), end);
-            d = AlignEdgeVertex(side * (lineWidth / -2), end);
-
-            vertices.Add(a);
-            vertices.Add(b);
-            vertices.Add(c);
-            vertices.Add(d);
-
-            UVs.Add(new Vector2(0f, 0f));
-            UVs.Add(new Vector2(1f, 0f));
-            UVs.Add(new Vector2(1f, 1f));
-            UVs.Add(new Vector2(0f, 1f));
-
-            triangles.Add(vertexCount * 4 + 0);
-            triangles.Add(vertexCount * 4 + 1);
-            triangles.Add(vertexCount * 4 + 2);
-            triangles.Add(vertexCount * 4 + 1);
-            triangles.Add(vertexCount * 4 + 2);
-            triangles.Add(vertexCount * 4 + 3);
-
-            ++vertexCount;
-        }
-        //for (int i = 1; i < testPoints.Length - 1; ++i)
-        //{
-        //    Vector3 point = testPoints[i];
-        //    Vector3 back = testPoints[i-1];
-        //    Vector3 front = testPoints[i + 1];
-        //    Vector3 side = Vector3.Cross(Vector3.back, back - point);
-        //    side.Normalize();
-        //    vertices.Add(point + side * (lineWidth / 2));
-        //    vertices.Add(point + side * (lineWidth / -2));
-        //    Debug.DrawLine(point + side * (lineWidth / 2), point + side * (lineWidth / -2), Color.red, 100f);
-
-        //    side = Vector3.Cross(Vector3.back, front - point);
-        //    side.Normalize();
-        //    vertices.Add(point + side * (lineWidth / 2));
-        //    vertices.Add(point + side * (lineWidth / -2));
-
-            
-        //    Debug.DrawLine(point + side * (lineWidth / 2), point + side * (lineWidth / -2), Color.red, 100f);
-
-        //    UVs.Add(new Vector2(0f, 0f));
-        //    UVs.Add(new Vector2(1f, 0f));
-        //    UVs.Add(new Vector2(1f, 1f));
-        //    UVs.Add(new Vector2(0f, 1f));
-
-        //    triangles.Add(vertexCount * 4 + 0);
-        //    triangles.Add(vertexCount * 4 + 1);
-        //    triangles.Add(vertexCount * 4 + 2);
-        //    triangles.Add(vertexCount * 4 + 0);
-        //    triangles.Add(vertexCount * 4 + 3);
-        //    triangles.Add(vertexCount * 4 + 1);
-        //    ++vertexCount;
-        //}
-        chartMesh.SetVertices(vertices);
-        chartMesh.uv = UVs.ToArray();
-        chartMesh.triangles = triangles.ToArray();
-    }
-    //private void AddUVs()
-    //{
-    //    List<Vector2> UVs = new List<Vector2>();
-    //    UVs.Add(new Vector2(0f, 0f));
-    //    UVs.Add(new Vector2(1f, 0f));
-    //    UVs.Add(new Vector2(1f, 1f));
-    //    UVs.Add(new Vector2(0f, 1f));
-    //    chartMesh.uv = UVs.ToArray();
-    //}
-    //private void AddTriangles()
-    //{
-    //    List<int> triangles = new List<int>();
-    //    triangles.Add(0);
-    //    triangles.Add(1);
-    //    triangles.Add(2);
-    //    triangles.Add(1);
-    //    triangles.Add(2);
-    //    triangles.Add(3);
-    //    chartMesh.triangles = triangles.ToArray();
-    //}
-    private Vector3 AlignEdgeVertex(Vector3 vertex, Vector3 point)
-    {
-        Vector3 hypotenouse;
-        if (vertex.y > 0)
-        {
-            hypotenouse = Vector3.up;
-        }
-        else
-        {
-            hypotenouse = Vector3.down;
-        }
-        float angle = Vector3.Angle(vertex, hypotenouse);
-        float hLength = vertex.magnitude / Mathf.Cos(angle);
-        Debug.Log(angle);
-        hypotenouse = hypotenouse * hLength;
-        return point + hypotenouse;
-    }
-
-    private void DrawChart()
-    {
-        int i = 0;
+        float xRange = Mathf.Abs(origin.x) * 2;
+        float yRange = Mathf.Abs(origin.y) * 2;
+        double minKPI = lastMinuteKPI.Peek();
+        double maxKPI = lastMinuteKPI.Peek();
         foreach (double KPI in lastMinuteKPI)
         {
-            lineRenderer.SetPosition(i, new Vector3(xOffset + ((xOffset * -2) / lastMinuteKPI.Count) * i, yOffset + (float)KPI, -2f));
-            ++i;
+            if (KPI > maxKPI) maxKPI = KPI;
+            if (KPI < minKPI) minKPI = KPI;
         }
-
+        double spread = maxKPI - minKPI;
+        float unit = (float)spread * 0.1f;
+        float orderOfMagnituede = Mathf.Ceil(Mathf.Log10(unit));
+        float bottom = orderOfMagnituede * Mathf.Floor((float)minKPI / orderOfMagnituede);
+        float top = orderOfMagnituede * Mathf.Ceil((float)maxKPI / orderOfMagnituede);
+        Debug.Log(orderOfMagnituede);
+        float scope = top - bottom;
+        Vector3[] points = new Vector3[60];
+        double[] KPIs = lastMinuteKPI.ToArray();
+        for (int i = 0; i < 60; ++i)
+        {
+            float x = xRange / 60 * i;
+            float y = yRange * top / (float)(KPIs[i] - bottom);
+            points[i] = new Vector3(x, y, 0f);
+        }
+        foreach (Vector3 v in points)
+        {
+            //Debug.Log(v);
+        }
+        //lineRenderer.UpdateMesh(points);
     }
-
 }
