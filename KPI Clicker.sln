@@ -1,7 +1,11 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2015
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KPI Clicker.CSharp.Plugins", "KPI Clicker.CSharp.Plugins.csproj", "{DA5D1D7A-BB0E-009F-EAED-6F76957B9E62}"
+EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KPI Clicker.CSharp", "KPI Clicker.CSharp.csproj", "{FDFA2ACC-79AC-9DED-350C-0267BBF54560}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KPI Clicker.CSharp.Editor", "KPI Clicker.CSharp.Editor.csproj", "{1B3966DD-4349-3BA2-90DA-1A1EE878B5A2}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -9,10 +13,18 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{DA5D1D7A-BB0E-009F-EAED-6F76957B9E62}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DA5D1D7A-BB0E-009F-EAED-6F76957B9E62}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DA5D1D7A-BB0E-009F-EAED-6F76957B9E62}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DA5D1D7A-BB0E-009F-EAED-6F76957B9E62}.Release|Any CPU.Build.0 = Release|Any CPU
 		{FDFA2ACC-79AC-9DED-350C-0267BBF54560}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{FDFA2ACC-79AC-9DED-350C-0267BBF54560}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{FDFA2ACC-79AC-9DED-350C-0267BBF54560}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{FDFA2ACC-79AC-9DED-350C-0267BBF54560}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1B3966DD-4349-3BA2-90DA-1A1EE878B5A2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1B3966DD-4349-3BA2-90DA-1A1EE878B5A2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1B3966DD-4349-3BA2-90DA-1A1EE878B5A2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1B3966DD-4349-3BA2-90DA-1A1EE878B5A2}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

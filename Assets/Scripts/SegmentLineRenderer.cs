@@ -59,7 +59,6 @@ public class SegmentLineRenderer : MonoBehaviour {
                 side.Normalize();
                 vertices[vertexCount++] = points[i] + side * (lineWidth / 2);
                 vertices[vertexCount++] = points[i] + side * (lineWidth / -2);
-                Debug.Log(vertexCount);
             }
             else
             {

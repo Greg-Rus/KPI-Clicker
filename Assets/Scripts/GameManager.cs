@@ -1,58 +1,70 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine.UI;
+using System;
 
 public class GameManager : MonoBehaviour {
 
     UIHandler UI;
     public Chart chart;
-    private double kpi = 0;
-    public double KPI
+    private float kpi = 0;
+    public float KPI
     {
         get { return kpi; }
         private set { kpi = value; UI.UpdateKPI(); }
     }
-    private int internCount;
-    public int KPIperIntern = 1;
-    public int internCost = 10;
-    private delegate void KPIcalculation();
-    private KPIcalculation CalculateKPI;
 
+    public Project intern;
+    public Project techSupport;
+    public Project PRAgency;
+    private List<Func<float>> KPICalculators;
+    
 	// Use this for initialization
 	void Start () {
+        KPICalculators = new List<Func<float>>();
         UI = GetComponent<UIHandler>();
         UI.OnKPIClicked += KPIUp;
-        UI.OnInternClick += BuyIntern;
+        UI.OnInternClick += BuyProjectType;
+        chart.UI = UI;
         StartCoroutine(StoreKPI());
+        intern.Init();
+        techSupport.Init();
+        PRAgency.Init();
     }
 	
 	// Update is called once per frame
 	void Update ()
     {
-        if(CalculateKPI != null) CalculateKPI();
+        foreach (Func<float> calculator in KPICalculators)
+        {
+            KPI += calculator();
+        }
     }
 
     private void KPIUp()
     {
-        KPI += 1d;
+        KPI += 1f;
     }
 
-    private void BuyIntern()
+    public void BuyProjectType(ProjectType type)
     {
-        if (KPI - internCost >= 0)
+        switch (type)
         {
-            KPI -= internCost;
-            ++internCount;
-            if (internCount == 1)
-            {
-                CalculateKPI += CalculateInternKPI;
-            }
+            case ProjectType.Intern: BuyProject(intern); break;
+            case ProjectType.TechSupport: BuyProject(techSupport); break;
+            case ProjectType.PRAgency: BuyProject(PRAgency); break;
         }
     }
 
-    private void CalculateInternKPI()
+    private void BuyProject(Project project)
     {
-        KPI += internCount * KPIperIntern * Time.deltaTime;
+        if (KPI - project.currentCost >= 0)
+        {
+            KPI -= project.currentCost;
+            project.Buy();
+            if (project.count == 1) KPICalculators.Add(project.GenerateKPI);
+        }
     }
 
     IEnumerator StoreKPI()
@@ -61,5 +73,4 @@ public class GameManager : MonoBehaviour {
         chart.StoreLastSecond(KPI);
         StartCoroutine(StoreKPI());
     }
-
 }
